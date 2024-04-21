@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.valerochka1337.dto.CatDTO;
 import org.valerochka1337.dto.OwnerDTO;
+import org.valerochka1337.exceptions.cat.InvalidBirthDateCatException;
+import org.valerochka1337.exceptions.cat.InvalidColorCatException;
 import org.valerochka1337.mapper.CatDTOModelMapper;
 import org.valerochka1337.mapper.CatDTOModelMapperImpl;
 import org.valerochka1337.mapper.OwnerDTOModelMapper;
@@ -41,7 +43,7 @@ public class ModelDTOMapperTests {
     OwnerDTO ownerDTO = OwnerDTO.builder().birthDate("2004-03-0").build();
 
     // Act && Assert
-    Assert.assertThrows(DateTimeParseException.class, () -> ownerDTOModelMapper.toModel(ownerDTO));
+    Assert.assertThrows(InvalidBirthDateCatException.class, () -> ownerDTOModelMapper.toModel(ownerDTO));
   }
 
   @Test
@@ -77,7 +79,7 @@ public class ModelDTOMapperTests {
     CatDTO catDTO = CatDTO.builder().birthDate("2004-03-0").build();
 
     // Act && Assert
-    Assert.assertThrows(DateTimeParseException.class, () -> catDTOModelMapper.toModel(catDTO));
+    Assert.assertThrows(InvalidBirthDateCatException.class, () -> catDTOModelMapper.toModel(catDTO));
   }
 
   @Test
@@ -86,7 +88,7 @@ public class ModelDTOMapperTests {
     CatDTO catDTO = CatDTO.builder().birthDate("2004-03-04").color("WRONG").build();
 
     // Act && Assert
-    Assert.assertThrows(IllegalArgumentException.class, () -> catDTOModelMapper.toModel(catDTO));
+    Assert.assertThrows(InvalidColorCatException.class, () -> catDTOModelMapper.toModel(catDTO));
   }
 
   @Test

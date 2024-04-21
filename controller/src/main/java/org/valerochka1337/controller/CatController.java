@@ -1,15 +1,11 @@
 package org.valerochka1337.controller;
 
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
 import org.valerochka1337.entity.Color;
-import org.valerochka1337.exceptions.cat.InvalidBirthDateCatException;
-import org.valerochka1337.exceptions.cat.InvalidColorCatException;
 import org.valerochka1337.mapper.CatDTOModelMapper;
 import org.valerochka1337.services.CatService;
 
@@ -29,17 +25,7 @@ public class CatController {
 
   @PostMapping
   public CatDTO createCat(@RequestBody CatDTO catDTO) {
-    try {
-      return catDTOModelMapper.toDTO(catService.createCat(catDTOModelMapper.toModel(catDTO)));
-    } catch (DateTimeParseException e) {
-      throw new InvalidBirthDateCatException();
-    } catch (Exception e) {
-      if (Arrays.stream(Color.values()).noneMatch(c -> c.name().equals(catDTO.getColor()))) {
-        throw new InvalidColorCatException();
-      }
-
-      throw e;
-    }
+    return catDTOModelMapper.toDTO(catService.createCat(catDTOModelMapper.toModel(catDTO)));
   }
 
   @GetMapping(path = "/{id}", params = "ownerID")

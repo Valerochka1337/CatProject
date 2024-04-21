@@ -1,11 +1,12 @@
 package org.valerochka1337.mapper;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.valerochka1337.dto.CatDTO;
 import org.valerochka1337.entity.Color;
+import org.valerochka1337.exceptions.cat.InvalidColorCatException;
 import org.valerochka1337.model.CatModel;
 
 public class CatControllerUtilMapper {
@@ -20,10 +21,18 @@ public class CatControllerUtilMapper {
       builder.name(cat.getName());
       builder.breed(cat.getBreed());
       if (cat.getBirthDate() != null) {
-        builder.birthDate(LocalDate.parse(cat.getBirthDate()));
+        try {
+          builder.birthDate(LocalDate.parse(cat.getBirthDate()));
+        } catch (DateTimeParseException exception) {
+          throw new InvalidColorCatException();
+        }
       }
       if (cat.getColor() != null) {
-        builder.color(Color.valueOf(cat.getColor()));
+        try {
+          builder.color(Color.valueOf(cat.getColor()));
+        } catch (IllegalArgumentException exception) {
+          throw new InvalidColorCatException();
+        }
       }
 
       resultList.add(builder.build());
@@ -40,7 +49,9 @@ public class CatControllerUtilMapper {
       CatDTO.CatDTOBuilder builder = CatDTO.builder();
       builder.id(cat.getId());
       builder.name(cat.getName());
-      builder.birthDate(cat.getBirthDate().toString());
+      if (cat.getBirthDate() != null) {
+        builder.birthDate(cat.getBirthDate().toString());
+      }
       builder.breed(cat.getBreed());
       if (cat.getColor() != null) {
         builder.color(cat.getColor().toString());

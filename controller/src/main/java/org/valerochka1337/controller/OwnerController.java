@@ -1,13 +1,11 @@
 package org.valerochka1337.controller;
 
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
 import org.valerochka1337.dto.OwnerDTO;
-import org.valerochka1337.exceptions.owner.InvalidBirthDateOwnerException;
 import org.valerochka1337.mapper.CatDTOModelMapper;
 import org.valerochka1337.mapper.OwnerDTOModelMapper;
 import org.valerochka1337.services.OwnerService;
@@ -33,12 +31,7 @@ public class OwnerController {
 
   @PostMapping
   public OwnerDTO createOwner(@RequestBody OwnerDTO owner) {
-    try {
-      return ownerDTOModelMapper.toDTO(
-          ownerService.createOwner(ownerDTOModelMapper.toModel(owner)));
-    } catch (DateTimeParseException e) {
-      throw new InvalidBirthDateOwnerException();
-    }
+    return ownerDTOModelMapper.toDTO(ownerService.createOwner(ownerDTOModelMapper.toModel(owner)));
   }
 
   @DeleteMapping(path = "/{id}")

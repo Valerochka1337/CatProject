@@ -1,15 +1,10 @@
 package org.valerochka1337.controller;
 
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
-import org.valerochka1337.entity.Color;
-import org.valerochka1337.exceptions.cat.InvalidBirthDateCatException;
-import org.valerochka1337.exceptions.cat.InvalidColorCatException;
 import org.valerochka1337.mapper.CatDTOModelMapper;
 import org.valerochka1337.services.CatService;
 
@@ -29,20 +24,10 @@ public class CatController {
 
   @PostMapping
   public CatDTO createCat(@RequestBody CatDTO catDTO) {
-    try {
-      return catDTOModelMapper.toDTO(catService.createCat(catDTOModelMapper.toModel(catDTO)));
-    } catch (DateTimeParseException e) {
-      throw new InvalidBirthDateCatException();
-    } catch (Exception e) {
-      if (Arrays.stream(Color.values()).noneMatch(c -> c.name().equals(catDTO.getColor()))) {
-        throw new InvalidColorCatException();
-      }
-
-      throw e;
-    }
+    return catDTOModelMapper.toDTO(catService.createCat(catDTOModelMapper.toModel(catDTO)));
   }
 
-  @GetMapping(path = "/{id}", params = "ownerID")
+  @PutMapping(path = "/{id}", params = "ownerID")
   public CatDTO setCatsOwner(
       @PathVariable(name = "id") UUID catId, @RequestParam(name = "ownerID") UUID ownerId) {
     return catDTOModelMapper.toDTO(catService.setCatsOwner(catId, ownerId));
@@ -82,7 +67,7 @@ public class CatController {
 
   @GetMapping(params = "color")
   public List<CatDTO> findCatsByColor(@RequestParam String color) {
-    return catService.findCatsByColor(Color.valueOf(color)).stream()
+    return catService.findCatsByColor(catDTOModelMapper.mapStringToColor(color)).stream()
         .map(catDTOModelMapper::toDTO)
         .toList();
   }

@@ -213,7 +213,7 @@ public class CatIntegrationTests {
     // Act
     String resultCat =
         mvc.perform(
-                get(
+                put(
                     "/api/v1/cats/797160a3-df79-4dd8-9109-8edd75150f38?ownerID="
                         + "c39057fb-740e-4cb4-8f8b-8e7f1663f818"))
             .andExpect(status().isOk())
@@ -310,5 +310,61 @@ public class CatIntegrationTests {
 
     // Assert
     JSONAssert.assertEquals(expectedCat1, resultCat1, JSONCompareMode.LENIENT);
+  }
+
+  @Test
+  @Sql("/sql/cat_init_1.sql")
+  public void testGetCatsByBreedSuccess() throws Exception {
+    // Set up
+    int expectedPugsAmount = 3; // Check in cat_init_1.sql
+
+    // Act
+    String result =
+        mvc.perform(get("/api/v1/cats?breed=pug"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray gotPugs = new JSONArray(result);
+
+    // Assert
+    Assertions.assertEquals(expectedPugsAmount, gotPugs.length());
+  }
+
+  @Test
+  @Sql("/sql/cat_init_1.sql")
+  public void testGetCatsByColorSuccess() throws Exception {
+    // Set up
+    int expectedRedAmount = 4; // Check in cat_init_1.sql
+
+    // Act
+    String result =
+        mvc.perform(get("/api/v1/cats?color=red"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray gotReds = new JSONArray(result);
+
+    // Assert
+    Assertions.assertEquals(expectedRedAmount, gotReds.length());
+  }
+
+  @Test
+  public void testGetCatsByColorFailInvalidColor() throws Exception {
+    // Act
+    String result =
+        mvc.perform(get("/api/v1/cats?color=wrong"))
+            .andExpect(status().isBadRequest())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONObject response = new JSONObject(result);
+
+    // Assert
+    Assertions.assertEquals("Invalid color", response.get("message"));
   }
 }

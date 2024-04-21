@@ -37,6 +37,7 @@ public class OwnerIntegrationTests {
           .withDatabaseName("db")
           .withUsername("postgres")
           .withPassword("postgres");
+
   @Autowired private MockMvc mvc;
   @Autowired private CatRepository catRepository;
   @Autowired private OwnerRepository ownerRepository;
@@ -187,5 +188,45 @@ public class OwnerIntegrationTests {
     Assertions.assertEquals(ownerSize, ownerRepository.findAll().size());
     Assertions.assertEquals(
         "No such owner with id: 797160a3-df79-4dd8-9109-8edd75150f38", response.get("message"));
+  }
+
+  @Test
+  @Sql(scripts = {"/sql/cat_init_1.sql", "/sql/owner_init_1.sql"})
+  public void testOwnerGetOwnedCatsSuccess() throws Exception {
+    // Set up
+    String expectedOwnedCats =
+        """
+          [
+            {
+              "id": "797160a3-df79-4dd8-9109-8edd75150f38",
+              "name": "Nick"
+            },
+            {
+              "id": "4cd44ae8-8e3d-477c-9bdc-fd90cb5a5b5e",
+              "name": "Polly"
+            }
+          ]
+        """;
+
+    // Act
+    mvc.perform(
+            put(
+                "/api/v1/cats/797160a3-df79-4dd8-9109-8edd75150f38?ownerID=c39057fb-740e-4cb4-8f8b-8e7f1663f818"))
+        .andExpect(status().isOk());
+    mvc.perform(
+            put(
+                "/api/v1/cats/4cd44ae8-8e3d-477c-9bdc-fd90cb5a5b5e?ownerID=c39057fb-740e-4cb4-8f8b-8e7f1663f818"))
+        .andExpect(status().isOk());
+
+    String result =
+        mvc.perform(
+                get("/api/v1/owners/c39057fb-740e-4cb4-8f8b-8e7f1663f818/ownedCats")) // Wrong id
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // Assert
+    JSONAssert.assertEquals(expectedOwnedCats, result, JSONCompareMode.LENIENT);
   }
 }

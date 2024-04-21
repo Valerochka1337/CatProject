@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
-import org.valerochka1337.entity.Color;
 import org.valerochka1337.mapper.CatDTOModelMapper;
 import org.valerochka1337.services.CatService;
 
@@ -28,7 +27,7 @@ public class CatController {
     return catDTOModelMapper.toDTO(catService.createCat(catDTOModelMapper.toModel(catDTO)));
   }
 
-  @GetMapping(path = "/{id}", params = "ownerID")
+  @PutMapping(path = "/{id}", params = "ownerID")
   public CatDTO setCatsOwner(
       @PathVariable(name = "id") UUID catId, @RequestParam(name = "ownerID") UUID ownerId) {
     return catDTOModelMapper.toDTO(catService.setCatsOwner(catId, ownerId));
@@ -68,7 +67,7 @@ public class CatController {
 
   @GetMapping(params = "color")
   public List<CatDTO> findCatsByColor(@RequestParam String color) {
-    return catService.findCatsByColor(Color.valueOf(color)).stream()
+    return catService.findCatsByColor(catDTOModelMapper.mapStringToColor(color)).stream()
         .map(catDTOModelMapper::toDTO)
         .toList();
   }

@@ -17,3 +17,7 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
+  security:
+    user:
+      password: user
+      name: user

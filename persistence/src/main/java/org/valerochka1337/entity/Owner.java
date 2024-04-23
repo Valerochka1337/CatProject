@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(
-    name = "owner",
+    name = "owners",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
 public class Owner {
   @Id

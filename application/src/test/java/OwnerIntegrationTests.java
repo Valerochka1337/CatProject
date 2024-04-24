@@ -27,7 +27,7 @@ import org.valerochka1337.repository.CatRepository;
 import org.valerochka1337.repository.OwnerRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Testcontainers
 public class OwnerIntegrationTests {
 

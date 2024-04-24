@@ -14,7 +14,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -27,7 +29,7 @@ import org.valerochka1337.repository.CatRepository;
 import org.valerochka1337.repository.OwnerRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Testcontainers
 public class CatIntegrationTests {
 

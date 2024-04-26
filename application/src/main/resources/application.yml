@@ -19,5 +19,5 @@ spring:
     baseline-version: 0
   security:
     user:
-      password: user
-      name: user
+      password: admin
+      name: admin

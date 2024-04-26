@@ -1,13 +1,11 @@
 package org.valerochka1337.entity;
 
 import jakarta.persistence.*;
+import java.util.Collection;
+import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -30,8 +28,8 @@ public class User {
   @OnDelete(action = OnDeleteAction.CASCADE)
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  private List<Role> roles;
+  private Collection<Role> roles;
 
-  @OneToOne(targetEntity = Owner.class, optional = false)
+  @OneToOne(targetEntity = Owner.class)
   private Owner owner;
 }

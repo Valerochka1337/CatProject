@@ -4,6 +4,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,7 @@ public class AuthController {
   }
 
   @PostMapping("register")
+  @PreAuthorize("hasAuthority('users:write')")
   public ResponseEntity<String> registerUser(@RequestBody RegisterDTO registerDTO)
       throws Exception {
     if (userRepository.existsByUsername(registerDTO.getUsername())) {
@@ -68,7 +70,9 @@ public class AuthController {
             .build();
 
     Role roles =
-        roleRepository.findByName("USER").orElseThrow(() -> new NoSuchRoleException("USER"));
+        roleRepository
+            .findByName("USER")
+            .orElseThrow(() -> new NoSuchRoleException("USER"));
 
     user.setRoles(Collections.singletonList(roles));
 

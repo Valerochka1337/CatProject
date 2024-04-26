@@ -1,5 +1,6 @@
 package org.valerochka1337.services;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -11,15 +12,15 @@ import org.valerochka1337.model.CatModel;
 public interface CatService {
   CatModel createCat(CatModel cat);
 
-  CatModel setCatsOwner(UUID catId, UUID ownerId);
+  CatModel setCatsOwner(UUID catId, UUID ownerId) throws AccessDeniedException;
 
-  void removeCat(UUID id);
+  void removeCat(UUID id) throws AccessDeniedException;
 
-  CatModel getCatById(UUID id);
+  CatModel getCatById(UUID id) throws AccessDeniedException;
 
   List<CatModel> getAllCats();
 
-  List<CatModel> findAllFriends(UUID id);
+  List<CatModel> findAllFriends(UUID id) throws AccessDeniedException;
 
   List<CatModel> findCatsByBreed(String breed);
 

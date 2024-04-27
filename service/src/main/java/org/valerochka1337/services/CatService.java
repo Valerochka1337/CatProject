@@ -2,6 +2,7 @@ package org.valerochka1337.services;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.valerochka1337.entity.Color;
@@ -18,7 +19,7 @@ public interface CatService {
 
   CatModel getCatById(UUID id) throws AccessDeniedException;
 
-  List<CatModel> getAllCats();
+  List<CatModel> getCats(Optional<String> breed, Optional<Color> color);
 
   List<CatModel> findAllFriends(UUID id) throws AccessDeniedException;
 

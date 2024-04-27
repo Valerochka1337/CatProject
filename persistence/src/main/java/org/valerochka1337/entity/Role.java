@@ -1,9 +1,7 @@
 package org.valerochka1337.entity;
 
 import jakarta.persistence.*;
-
 import java.util.Collection;
-import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

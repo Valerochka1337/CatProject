@@ -2,9 +2,9 @@ package org.valerochka1337.controller;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
@@ -53,8 +53,15 @@ public class CatController {
 
   @GetMapping()
   @PreAuthorize("hasAuthority('cats:read')")
-  public List<CatDTO> getAllCats() {
-    return catService.getAllCats().stream().map(catDTOModelMapper::toDTO).toList();
+  public List<CatDTO> getCats(
+      @RequestParam(required = false) String breed, @RequestParam(required = false) String color) {
+    return catService
+        .getCats(
+            Optional.ofNullable(breed),
+            Optional.ofNullable(catDTOModelMapper.mapStringToColor(color)))
+        .stream()
+        .map(catDTOModelMapper::toDTO)
+        .toList();
   }
 
   @GetMapping(path = "{id}/friends")
@@ -75,19 +82,5 @@ public class CatController {
   public void unfriendCats(
       @RequestParam(name = "id1") UUID cat1Id, @RequestParam(name = "id2") UUID cat2Id) {
     catService.unfriendCats(cat1Id, cat2Id);
-  }
-
-  @GetMapping(params = "color")
-  @PreAuthorize("hasAuthority('cats:read')")
-  public List<CatDTO> findCatsByColor(@RequestParam String color) {
-    return catService.findCatsByColor(catDTOModelMapper.mapStringToColor(color)).stream()
-        .map(catDTOModelMapper::toDTO)
-        .toList();
-  }
-
-  @GetMapping(params = "breed")
-  @PreAuthorize("hasAuthority('cats:read')")
-  public List<CatDTO> findCatsByBreed(@RequestParam String breed) {
-    return catService.findCatsByBreed(breed).stream().map(catDTOModelMapper::toDTO).toList();
   }
 }

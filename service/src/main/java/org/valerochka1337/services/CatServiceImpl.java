@@ -89,8 +89,20 @@ public class CatServiceImpl implements CatService {
   }
 
   @Override
-  public List<CatModel> getAllCats() {
-    return filterCats(catRepo.findAll()).stream().map(catMapper::toModel).toList();
+  public List<CatModel> getCats(Optional<String> breed, Optional<Color> color) {
+    List<Cat> repoResult;
+
+    if (breed.isPresent() && color.isPresent()) {
+      repoResult = catRepo.findCatByBreedAndColor(breed.get(), color.get());
+    } else if (breed.isPresent()) {
+      repoResult = catRepo.findCatsByBreed(breed.get());
+    } else if (color.isPresent()) {
+      repoResult = catRepo.findCatsByColor(color.get());
+    } else {
+      repoResult = catRepo.findAll();
+    }
+
+    return filterCats(repoResult).stream().map(catMapper::toModel).toList();
   }
 
   @Override

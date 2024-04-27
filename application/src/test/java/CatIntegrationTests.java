@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -369,5 +368,25 @@ public class CatIntegrationTests {
 
     // Assert
     Assertions.assertEquals("Invalid color", response.get("message"));
+  }
+
+  @Test
+  @Sql("/sql/cat_init_1.sql")
+  public void testGetCatsByBreedAndColor() throws Exception {
+    // Set up
+    int expectedRedAmount = 2; // Check in cat_init_1.sql
+
+    // Act
+    String result =
+        mvc.perform(get("/api/v1/cats?color=red&breed=pug"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray gotReds = new JSONArray(result);
+
+    // Assert
+    Assertions.assertEquals(expectedRedAmount, gotReds.length());
   }
 }

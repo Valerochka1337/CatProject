@@ -17,7 +17,7 @@ import org.valerochka1337.service.CatUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity()
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private CatUserDetailsService userDetailsService;

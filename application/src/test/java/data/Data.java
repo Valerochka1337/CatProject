@@ -110,6 +110,20 @@ public class Data {
             "No such cat with id: 90dd496d-cb25-44fb-bec7-0fc22c67382f"));
   }
 
+  public static Stream<Arguments> catFilteringSuccess() {
+    // filter query, expected amount of cats
+    return Stream.of(
+        Arguments.of("?color=red", 4),
+        Arguments.of("?color=blue", 2),
+        Arguments.of("?color=green", 2),
+        Arguments.of("?breed=pug", 3),
+        Arguments.of("?breed=pug&color=red", 2),
+        Arguments.of("?color=red&breed=pug", 2),
+        Arguments.of("?color=green&breed=frog", 1),
+        Arguments.of("?breed=UNKNOWN", 0)
+    );
+  }
+
   // Owner
   public static Stream<Arguments> ownerCreationSuccessArguments() {
     // args: Json of a cat, creation request result

@@ -314,45 +314,25 @@ public class CatIntegrationTests {
     JSONAssert.assertEquals(expectedCat1, resultCat1, JSONCompareMode.LENIENT);
   }
 
-  @Test
-  @Sql("/sql/cat_init_1.sql")
-  public void testGetCatsByBreedSuccess() throws Exception {
-    // Set up
-    int expectedPugsAmount = 3; // Check in cat_init_1.sql
 
+  @ParameterizedTest
+  @MethodSource("data.Data#catFilteringSuccess")
+  @Sql("/sql/cat_init_1.sql")
+  public void testGetCatsByBreedSuccess(String filterQuery, int expectedCatsAmount) throws Exception {
     // Act
     String result =
-        mvc.perform(get("/api/v1/cats?breed=pug"))
+        mvc.perform(get("/api/v1/cats" + filterQuery))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
 
-    JSONArray gotPugs = new JSONArray(result);
+    JSONArray gotCatsAmount = new JSONArray(result);
 
     // Assert
-    Assertions.assertEquals(expectedPugsAmount, gotPugs.length());
+    Assertions.assertEquals(expectedCatsAmount, gotCatsAmount.length());
   }
 
-  @Test
-  @Sql("/sql/cat_init_1.sql")
-  public void testGetCatsByColorSuccess() throws Exception {
-    // Set up
-    int expectedRedAmount = 4; // Check in cat_init_1.sql
-
-    // Act
-    String result =
-        mvc.perform(get("/api/v1/cats?color=red"))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    JSONArray gotReds = new JSONArray(result);
-
-    // Assert
-    Assertions.assertEquals(expectedRedAmount, gotReds.length());
-  }
 
   @Test
   public void testGetCatsByColorFailInvalidColor() throws Exception {
@@ -368,25 +348,5 @@ public class CatIntegrationTests {
 
     // Assert
     Assertions.assertEquals("Invalid color", response.get("message"));
-  }
-
-  @Test
-  @Sql("/sql/cat_init_1.sql")
-  public void testGetCatsByBreedAndColor() throws Exception {
-    // Set up
-    int expectedRedAmount = 2; // Check in cat_init_1.sql
-
-    // Act
-    String result =
-        mvc.perform(get("/api/v1/cats?color=red&breed=pug"))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    JSONArray gotReds = new JSONArray(result);
-
-    // Assert
-    Assertions.assertEquals(expectedRedAmount, gotReds.length());
   }
 }

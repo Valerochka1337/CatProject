@@ -120,8 +120,13 @@ public class Data {
         Arguments.of("?breed=pug&color=red", 2),
         Arguments.of("?color=red&breed=pug", 2),
         Arguments.of("?color=green&breed=frog", 1),
-        Arguments.of("?breed=UNKNOWN", 0)
-    );
+        Arguments.of("?breed=UNKNOWN", 0));
+  }
+
+  public static Stream<Arguments> catPaging() {
+    // page num, page size, expected elements amount on page
+    return Stream.of(
+        Arguments.of(0, 3, 3), Arguments.of(1, 3, 3), Arguments.of(2, 3, 2), Arguments.of(3, 3, 0));
   }
 
   // Owner
@@ -185,5 +190,10 @@ public class Data {
                 }
               """,
             "No such owned cat"));
+  }
+
+  public static Stream<Arguments> ownerPaging() {
+    // page num, page size, expected elements amount on page
+    return Stream.of(Arguments.of(0, 2, 2), Arguments.of(1, 2, 1), Arguments.of(2, 2, 0));
   }
 }

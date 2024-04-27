@@ -4,6 +4,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
@@ -51,14 +52,15 @@ public class OwnerController {
 
   @GetMapping
   @PreAuthorize("hasAuthority('owners:read')")
-  public List<OwnerDTO> findAllOwners() {
-    return ownerService.getAllOwners().stream().map(ownerDTOModelMapper::toDTO).toList();
+  public List<OwnerDTO> findAllOwners(Pageable pageable) {
+    return ownerService.getAllOwners(pageable).stream().map(ownerDTOModelMapper::toDTO).toList();
   }
 
   @GetMapping(path = "/{id}/ownedCats")
   @PreAuthorize("hasAuthority('owners:read')")
-  public List<CatDTO> findAllOwnedCats(@PathVariable UUID id) throws AccessDeniedException {
-    return ownerService.findAllOwnedCats(ownerService.getOwnerById(id)).stream()
+  public List<CatDTO> findAllOwnedCats(@PathVariable UUID id, Pageable pageable)
+      throws AccessDeniedException {
+    return ownerService.findAllOwnedCats(ownerService.getOwnerById(id), pageable).stream()
         .map(catDTOModelMapper::toDTO)
         .toList();
   }

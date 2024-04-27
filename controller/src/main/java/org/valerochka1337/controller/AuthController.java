@@ -70,9 +70,7 @@ public class AuthController {
             .build();
 
     Role roles =
-        roleRepository
-            .findByName("USER")
-            .orElseThrow(() -> new NoSuchRoleException("USER"));
+        roleRepository.findByName("USER").orElseThrow(() -> new NoSuchRoleException("USER"));
 
     user.setRoles(Collections.singletonList(roles));
 

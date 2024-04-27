@@ -13,4 +13,6 @@ public interface CatRepository extends JpaRepository<Cat, UUID> {
   List<Cat> findCatsByBreed(String breed);
 
   List<Cat> findCatsByColor(Color color);
+
+  List<Cat> findCatByBreedAndColor(String breed, Color color);
 }

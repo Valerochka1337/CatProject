@@ -1,4 +1,4 @@
-INSERT INTO cat (id, name, color, breed, owner_id, birth_date)
+INSERT INTO cats (id, name, color, breed, owner_id, birth_date)
 VALUES ('797160a3-df79-4dd8-9109-8edd75150f38'::uuid, 'Nick', 'RED', 'pug', null, '2004-03-04'::date),
        ('4cd44ae8-8e3d-477c-9bdc-fd90cb5a5b5e'::uuid, 'Polly', 'BLUE', 'milkshake', null, '2002-03-04'::date),
        ('9aaa7a5c-c35d-4c29-b475-ed85949be302'::uuid, 'Cracker', 'RED', 'bulldog', null, '2001-03-04'::date),

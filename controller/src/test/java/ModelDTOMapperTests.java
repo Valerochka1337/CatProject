@@ -42,7 +42,8 @@ public class ModelDTOMapperTests {
     OwnerDTO ownerDTO = OwnerDTO.builder().birthDate("2004-03-0").build();
 
     // Act && Assert
-    Assert.assertThrows(InvalidBirthDateCatException.class, () -> ownerDTOModelMapper.toModel(ownerDTO));
+    Assert.assertThrows(
+        InvalidBirthDateCatException.class, () -> ownerDTOModelMapper.toModel(ownerDTO));
   }
 
   @Test
@@ -78,7 +79,8 @@ public class ModelDTOMapperTests {
     CatDTO catDTO = CatDTO.builder().birthDate("2004-03-0").build();
 
     // Act && Assert
-    Assert.assertThrows(InvalidBirthDateCatException.class, () -> catDTOModelMapper.toModel(catDTO));
+    Assert.assertThrows(
+        InvalidBirthDateCatException.class, () -> catDTOModelMapper.toModel(catDTO));
   }
 
   @Test

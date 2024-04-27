@@ -1,20 +1,22 @@
 package org.valerochka1337.services;
 
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.valerochka1337.entity.Cat;
-import org.valerochka1337.entity.Color;
-import org.valerochka1337.entity.Owner;
+import org.valerochka1337.entity.*;
 import org.valerochka1337.exceptions.cat.*;
 import org.valerochka1337.exceptions.owner.NoSuchOwnerException;
 import org.valerochka1337.mapper.CatModelEntityMapper;
 import org.valerochka1337.model.CatModel;
 import org.valerochka1337.repository.CatRepository;
 import org.valerochka1337.repository.OwnerRepository;
+import org.valerochka1337.repository.UserRepository;
 
-@Service()
+@Service
 public class CatServiceImpl implements CatService {
+  private final UserRepository userRepo;
   private final OwnerRepository ownerRepo;
   private final CatRepository catRepo;
 
@@ -22,7 +24,11 @@ public class CatServiceImpl implements CatService {
 
   @Autowired
   public CatServiceImpl(
-      CatRepository catRepo, OwnerRepository ownerRepo, CatModelEntityMapper catMapper) {
+      UserRepository userRepo,
+      CatRepository catRepo,
+      OwnerRepository ownerRepo,
+      CatModelEntityMapper catMapper) {
+    this.userRepo = userRepo;
     this.catRepo = catRepo;
     this.ownerRepo = ownerRepo;
     this.catMapper = catMapper;
@@ -40,10 +46,17 @@ public class CatServiceImpl implements CatService {
   }
 
   @Override
-  public CatModel setCatsOwner(UUID catId, UUID ownerId) {
+  public CatModel setCatsOwner(UUID catId, UUID ownerId) throws AccessDeniedException {
     Cat catEntity = catRepo.findById(catId).orElseThrow(() -> new NoSuchCatException(catId));
     Owner ownerEntity =
         ownerRepo.findById(ownerId).orElseThrow(() -> new NoSuchOwnerException(ownerId));
+
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    User user = userRepo.findByUsername(username).get();
+    if (!user.getRoles().stream().map(Role::getName).toList().contains("ADMIN")
+        && !user.getOwner().getId().equals(ownerEntity.getId())) {
+      throw new AccessDeniedException("Can't set cat to another owner");
+    }
 
     catEntity.setOwner(ownerEntity);
     ownerEntity.getOwnedCats().add(catEntity);
@@ -55,41 +68,49 @@ public class CatServiceImpl implements CatService {
   }
 
   @Override
-  public void removeCat(UUID id) {
-    if (!catRepo.existsById(id)) {
-      throw new NoSuchCatException(id);
+  public void removeCat(UUID id) throws AccessDeniedException {
+    Cat catEntity = catRepo.findById(id).orElseThrow(() -> new NoSuchCatException(id));
+
+    if (!checkAccess(catEntity)) {
+      throw new AccessDeniedException("User has no access to this cat");
     }
 
     catRepo.deleteById(id);
   }
 
   @Override
-  public CatModel getCatById(UUID id) {
+  public CatModel getCatById(UUID id) throws AccessDeniedException {
     Cat catEntity = catRepo.findById(id).orElseThrow(() -> new NoSuchCatException(id));
+    if (!checkAccess(catEntity)) {
+      throw new AccessDeniedException("User has no access to this cat");
+    }
 
     return catMapper.toModel(catEntity);
   }
 
   @Override
   public List<CatModel> getAllCats() {
-    return catRepo.findAll().stream().map(catMapper::toModel).toList();
+    return filterCats(catRepo.findAll()).stream().map(catMapper::toModel).toList();
   }
 
   @Override
-  public List<CatModel> findAllFriends(UUID id) {
+  public List<CatModel> findAllFriends(UUID id) throws AccessDeniedException {
     Cat catEntity = catRepo.findById(id).orElseThrow(() -> new NoSuchCatException(id));
+    if (!checkAccess(catEntity)) {
+      throw new AccessDeniedException("User has no access to this cat");
+    }
 
     return catEntity.getFriendCats().stream().map(catMapper::toModel).toList();
   }
 
   @Override
   public List<CatModel> findCatsByBreed(String breed) {
-    return catRepo.findCatsByBreed(breed).stream().map(catMapper::toModel).toList();
+    return filterCats(catRepo.findCatsByBreed(breed)).stream().map(catMapper::toModel).toList();
   }
 
   @Override
   public List<CatModel> findCatsByColor(Color color) {
-    return catRepo.findCatsByColor(color).stream().map(catMapper::toModel).toList();
+    return filterCats(catRepo.findCatsByColor(color)).stream().map(catMapper::toModel).toList();
   }
 
   @Override
@@ -158,5 +179,19 @@ public class CatServiceImpl implements CatService {
     if (cat.getOwner() != null && !ownerRepo.existsById(cat.getOwner().getId())) {
       throw new NoSuchOwnerException(cat.getOwner().getId());
     }
+  }
+
+  private List<Cat> filterCats(Collection<Cat> cats) {
+    return cats.stream().filter(this::checkAccess).toList();
+  }
+
+  private boolean checkAccess(Cat cat) {
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    User user = userRepo.findByUsername(username).get();
+
+    if (user.getRoles().stream().map(Role::getName).toList().contains("ADMIN")) {
+      return true;
+    }
+    return cat.getOwner() != null && cat.getOwner().getId() == user.getOwner().getId();
   }
 }

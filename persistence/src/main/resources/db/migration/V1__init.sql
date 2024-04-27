@@ -1,23 +1,19 @@
 /*
     Owner table
 */
-create table owner
+create table owners
 (
     id         uuid not null
-        constraint owners_pkey
-            primary key,
+        primary key,
     name       text not null,
     birth_date date not null
 );
-
-alter table owner
-    owner to postgres;
 
 
 /*
     Cat table
 */
-create table cat
+create table cats
 (
     id         uuid not null
         primary key,
@@ -25,12 +21,10 @@ create table cat
     color      text,
     breed      text,
     owner_id   uuid
-                    references owner on delete set null,
+                    references owners on delete set null,
     birth_date date not null
 );
 
-alter table cat
-    owner to postgres;
 
 /*
     Cat friendship many-to-many table
@@ -38,10 +32,7 @@ alter table cat
 create table cat_friendship
 (
     cat1_id uuid not null
-        references cat on delete cascade,
+        references cats on delete cascade,
     cat2_id uuid not null
-        references cat on delete cascade
+        references cats on delete cascade
 );
-
-alter table cat_friendship
-    owner to postgres;

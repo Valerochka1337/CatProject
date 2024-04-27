@@ -9,27 +9,13 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>application</artifactId>
+    <artifactId>security</artifactId>
+    <version>0.0.1</version>
 
     <dependencies>
         <dependency>
             <groupId>org.valerochka1337</groupId>
             <artifactId>persistence</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.valerochka1337</groupId>
-            <artifactId>service</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.valerochka1337</groupId>
-            <artifactId>controller</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.valerochka1337</groupId>
-            <artifactId>security</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>

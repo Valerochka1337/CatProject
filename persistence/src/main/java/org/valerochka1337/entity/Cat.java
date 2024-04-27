@@ -11,9 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(
-    name = "cat",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
+@Table(name = "cats")
 public class Cat {
   @Id @GeneratedValue private UUID id;
 

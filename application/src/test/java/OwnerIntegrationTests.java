@@ -231,4 +231,22 @@ public class OwnerIntegrationTests {
     // Assert
     JSONAssert.assertEquals(expectedOwnedCats, result, JSONCompareMode.LENIENT);
   }
+
+  @ParameterizedTest
+  @MethodSource("data.Data#ownerPaging")
+  @Sql("/sql/owner_init_1.sql")
+  public void testPagingGetAllOwners(int page, int size, int expectedAmount) throws Exception {
+    // Act
+    String result =
+        mvc.perform(get(String.format("/api/v1/owners?page=%s&size=%s", page, size)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray gotOwners = new JSONArray(result);
+
+    // Assert
+    Assertions.assertEquals(expectedAmount, gotOwners.length());
+  }
 }

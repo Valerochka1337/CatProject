@@ -2,10 +2,13 @@ package org.valerochka1337.services;
 
 import java.nio.file.AccessDeniedException;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.valerochka1337.entity.Cat;
 import org.valerochka1337.entity.Owner;
 import org.valerochka1337.entity.Role;
 import org.valerochka1337.entity.User;
@@ -89,14 +92,13 @@ public class OwnerServiceImpl implements OwnerService {
   }
 
   @Override
-  public List<OwnerModel> getAllOwners() {
-    return filterOwners(ownerRepo.findAll()).stream()
-        .map(ownerMapper::toModel)
-        .collect(Collectors.toList());
+  public List<OwnerModel> getAllOwners(Pageable pageable) {
+    return getPagedAndSortedOwners(filterOwners(ownerRepo.findAll()), pageable);
   }
 
   @Override
-  public List<CatModel> findAllOwnedCats(OwnerModel owner) throws AccessDeniedException {
+  public List<CatModel> findAllOwnedCats(OwnerModel owner, Pageable pageable)
+      throws AccessDeniedException {
     Owner ownerEntity =
         ownerRepo
             .findById(owner.getId())
@@ -105,7 +107,7 @@ public class OwnerServiceImpl implements OwnerService {
       throw new AccessDeniedException("User has no access to this owner");
     }
 
-    return ownerEntity.getOwnedCats().stream().map(catMapper::toModel).toList();
+    return getPagedAndSortedCats(ownerEntity.getOwnedCats().stream().toList(), pageable);
   }
 
   private void validateOwner(OwnerModel ownerModel) {
@@ -140,5 +142,29 @@ public class OwnerServiceImpl implements OwnerService {
       return true;
     }
     return owner.getId() == user.getOwner().getId();
+  }
+
+  private List<CatModel> getPagedAndSortedCats(List<Cat> cats, Pageable pageable) {
+    final int start = Math.min((int) pageable.getOffset(), cats.size());
+    final int end = Math.min((start + pageable.getPageSize()), cats.size());
+
+    return new PageImpl<>(
+            cats.subList(start, end),
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()),
+            cats.size())
+        .map(catMapper::toModel)
+        .toList();
+  }
+
+  private List<OwnerModel> getPagedAndSortedOwners(List<Owner> owners, Pageable pageable) {
+    final int start = Math.min((int) pageable.getOffset(), owners.size());
+    final int end = Math.min((start + pageable.getPageSize()), owners.size());
+
+    return new PageImpl<>(
+            owners.subList(start, end),
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()),
+            owners.size())
+        .map(ownerMapper::toModel)
+        .toList();
   }
 }

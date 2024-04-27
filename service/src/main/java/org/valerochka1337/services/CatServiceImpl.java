@@ -3,6 +3,9 @@ package org.valerochka1337.services;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.valerochka1337.entity.*;
@@ -89,40 +92,34 @@ public class CatServiceImpl implements CatService {
   }
 
   @Override
-  public List<CatModel> getCats(Optional<String> breed, Optional<Color> color) {
-    List<Cat> repoResult;
+  public List<CatModel> getCats(Optional<String> breed, Optional<Color> color, Pageable pageable) {
+    List<Cat> resultCats;
 
     if (breed.isPresent() && color.isPresent()) {
-      repoResult = catRepo.findCatByBreedAndColor(breed.get(), color.get());
+      resultCats = catRepo.findCatByBreedAndColor(breed.get(), color.get());
     } else if (breed.isPresent()) {
-      repoResult = catRepo.findCatsByBreed(breed.get());
+      resultCats = catRepo.findCatsByBreed(breed.get());
     } else if (color.isPresent()) {
-      repoResult = catRepo.findCatsByColor(color.get());
+      resultCats = catRepo.findCatsByColor(color.get());
     } else {
-      repoResult = catRepo.findAll();
+      resultCats = catRepo.findAll();
     }
 
-    return filterCats(repoResult).stream().map(catMapper::toModel).toList();
+    List<Cat> filteredCats = filterCats(resultCats);
+
+    return getPagedAndSorted(filteredCats, pageable);
   }
 
   @Override
-  public List<CatModel> findAllFriends(UUID id) throws AccessDeniedException {
+  public List<CatModel> findAllFriends(UUID id, Pageable pageable) throws AccessDeniedException {
     Cat catEntity = catRepo.findById(id).orElseThrow(() -> new NoSuchCatException(id));
     if (!checkAccess(catEntity)) {
       throw new AccessDeniedException("User has no access to this cat");
     }
 
-    return catEntity.getFriendCats().stream().map(catMapper::toModel).toList();
-  }
+    List<Cat> friendCats = catEntity.getFriendCats().stream().toList();
 
-  @Override
-  public List<CatModel> findCatsByBreed(String breed) {
-    return filterCats(catRepo.findCatsByBreed(breed)).stream().map(catMapper::toModel).toList();
-  }
-
-  @Override
-  public List<CatModel> findCatsByColor(Color color) {
-    return filterCats(catRepo.findCatsByColor(color)).stream().map(catMapper::toModel).toList();
+    return getPagedAndSorted(friendCats, pageable);
   }
 
   @Override
@@ -205,5 +202,17 @@ public class CatServiceImpl implements CatService {
       return true;
     }
     return cat.getOwner() != null && cat.getOwner().getId() == user.getOwner().getId();
+  }
+
+  private List<CatModel> getPagedAndSorted(List<Cat> cats, Pageable pageable) {
+    final int start = Math.min((int) pageable.getOffset(), cats.size());
+    final int end = Math.min((start + pageable.getPageSize()), cats.size());
+
+    return new PageImpl<>(
+            cats.subList(start, end),
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()),
+            cats.size())
+        .map(catMapper::toModel)
+        .toList();
   }
 }

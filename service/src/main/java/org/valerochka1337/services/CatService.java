@@ -4,6 +4,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.valerochka1337.entity.Color;
 import org.valerochka1337.exceptions.cat.*;
@@ -19,13 +20,9 @@ public interface CatService {
 
   CatModel getCatById(UUID id) throws AccessDeniedException;
 
-  List<CatModel> getCats(Optional<String> breed, Optional<Color> color);
+  List<CatModel> getCats(Optional<String> breed, Optional<Color> color, Pageable pageable);
 
-  List<CatModel> findAllFriends(UUID id) throws AccessDeniedException;
-
-  List<CatModel> findCatsByBreed(String breed);
-
-  List<CatModel> findCatsByColor(Color color);
+  List<CatModel> findAllFriends(UUID id, Pageable pageable) throws AccessDeniedException;
 
   void friendCats(UUID Cat1Id, UUID Cat2Id);
 

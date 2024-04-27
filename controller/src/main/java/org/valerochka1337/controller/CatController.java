@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.valerochka1337.dto.CatDTO;
@@ -54,11 +55,14 @@ public class CatController {
   @GetMapping()
   @PreAuthorize("hasAuthority('cats:read')")
   public List<CatDTO> getCats(
-      @RequestParam(required = false) String breed, @RequestParam(required = false) String color) {
+      @RequestParam(required = false) String breed,
+      @RequestParam(required = false) String color,
+      Pageable pageable) {
     return catService
         .getCats(
             Optional.ofNullable(breed),
-            Optional.ofNullable(catDTOModelMapper.mapStringToColor(color)))
+            Optional.ofNullable(catDTOModelMapper.mapStringToColor(color)),
+            pageable)
         .stream()
         .map(catDTOModelMapper::toDTO)
         .toList();
@@ -66,8 +70,9 @@ public class CatController {
 
   @GetMapping(path = "{id}/friends")
   @PreAuthorize("hasAuthority('cats:read')")
-  public List<CatDTO> findAllFriends(@PathVariable UUID id) throws AccessDeniedException {
-    return catService.findAllFriends(id).stream().map(catDTOModelMapper::toDTO).toList();
+  public List<CatDTO> findAllFriends(@PathVariable UUID id, Pageable pageable)
+      throws AccessDeniedException {
+    return catService.findAllFriends(id, pageable).stream().map(catDTOModelMapper::toDTO).toList();
   }
 
   @PutMapping(path = "friend")

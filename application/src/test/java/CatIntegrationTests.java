@@ -314,11 +314,11 @@ public class CatIntegrationTests {
     JSONAssert.assertEquals(expectedCat1, resultCat1, JSONCompareMode.LENIENT);
   }
 
-
   @ParameterizedTest
   @MethodSource("data.Data#catFilteringSuccess")
   @Sql("/sql/cat_init_1.sql")
-  public void testGetCatsByBreedSuccess(String filterQuery, int expectedCatsAmount) throws Exception {
+  public void testGetCatsByBreedSuccess(String filterQuery, int expectedCatsAmount)
+      throws Exception {
     // Act
     String result =
         mvc.perform(get("/api/v1/cats" + filterQuery))
@@ -327,12 +327,11 @@ public class CatIntegrationTests {
             .getResponse()
             .getContentAsString();
 
-    JSONArray gotCatsAmount = new JSONArray(result);
+    JSONArray gotCats = new JSONArray(result);
 
     // Assert
-    Assertions.assertEquals(expectedCatsAmount, gotCatsAmount.length());
+    Assertions.assertEquals(expectedCatsAmount, gotCats.length());
   }
-
 
   @Test
   public void testGetCatsByColorFailInvalidColor() throws Exception {
@@ -348,5 +347,23 @@ public class CatIntegrationTests {
 
     // Assert
     Assertions.assertEquals("Invalid color", response.get("message"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("data.Data#catPaging")
+  @Sql("/sql/cat_init_1.sql")
+  public void testPagingGetAllCats(int page, int size, int expectedAmount) throws Exception {
+    // Act
+    String result =
+        mvc.perform(get(String.format("/api/v1/cats?page=%s&size=%s", page, size)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray gotCats = new JSONArray(result);
+
+    // Assert
+    Assertions.assertEquals(expectedAmount, gotCats.length());
   }
 }

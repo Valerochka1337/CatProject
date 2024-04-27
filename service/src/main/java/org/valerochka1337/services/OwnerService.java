@@ -3,6 +3,7 @@ package org.valerochka1337.services;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.valerochka1337.model.CatModel;
 import org.valerochka1337.model.OwnerModel;
@@ -13,9 +14,9 @@ public interface OwnerService {
 
   OwnerModel getOwnerById(UUID id) throws AccessDeniedException;
 
-  List<OwnerModel> getAllOwners();
+  List<OwnerModel> getAllOwners(Pageable pageable);
 
   void removeOwner(OwnerModel owner) throws AccessDeniedException;
 
-  List<CatModel> findAllOwnedCats(OwnerModel owner) throws AccessDeniedException;
+  List<CatModel> findAllOwnedCats(OwnerModel owner, Pageable pageable) throws AccessDeniedException;
 }

@@ -15,13 +15,13 @@ import org.valerochka1337.entity.Role;
 import org.valerochka1337.entity.User;
 import org.valerochka1337.repository.UserRepository;
 
-@Service
-public class CatUserDetailsService implements UserDetailsService {
+@Service("UserDetailsServiceImpl")
+public class UserDetailsServiceImpl implements UserDetailsService {
 
   private final UserRepository userRepository;
 
   @Autowired
-  public CatUserDetailsService(UserRepository userRepository) {
+  public UserDetailsServiceImpl(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
 

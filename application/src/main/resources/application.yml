@@ -18,6 +18,10 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
   security:
+    jwt:
+      header: Authorization
+      secret: VALEROCHKA1337228HASELNUTBEANDEFINITIONLOLKEKCHEBUREKTHISISREALLYLONGSTRING
+      expiration: 100000000 # expiration time in milliseconds
     user:
       password: admin
       name: admin

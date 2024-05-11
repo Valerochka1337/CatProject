@@ -1,25 +1,32 @@
-package org.valerochka1337;
+package org.valerochka1337.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.valerochka1337.exceptions.JwtAuthenticationException;
-
-import java.io.IOException;
 
 @Component
 public class JwtTokenFilter extends GenericFilterBean {
   private final JwtTokenProvider jwtTokenProvider;
 
-  public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
+  private final HandlerExceptionResolver handlerExceptionResolver;
+
+  public JwtTokenFilter(
+      JwtTokenProvider jwtTokenProvider,
+      @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
     this.jwtTokenProvider = jwtTokenProvider;
+    this.handlerExceptionResolver = handlerExceptionResolver;
   }
 
   @Override
@@ -36,12 +43,15 @@ public class JwtTokenFilter extends GenericFilterBean {
           SecurityContextHolder.getContext().setAuthentication(authentication);
         }
       }
-    } catch (JwtAuthenticationException exception) {
+      
+      filterChain.doFilter(servletRequest, servletResponse);
+    } catch (Exception exception) {
       SecurityContextHolder.clearContext();
-      ((HttpServletResponse) servletResponse).sendError(exception.getStatus().value());
-      throw new JwtAuthenticationException("JWT token is expired or invalid");
+      handlerExceptionResolver.resolveException(
+          (HttpServletRequest) servletRequest,
+          (HttpServletResponse) servletResponse,
+          null,
+          exception);
     }
-
-    filterChain.doFilter(servletRequest, servletResponse);
   }
 }

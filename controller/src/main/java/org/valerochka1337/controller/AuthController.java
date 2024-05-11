@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.valerochka1337.JwtTokenProvider;
+import org.valerochka1337.jwt.JwtTokenProvider;
 import org.valerochka1337.dto.AuthDTO;
 import org.valerochka1337.dto.RegisterDTO;
 import org.valerochka1337.entity.Role;

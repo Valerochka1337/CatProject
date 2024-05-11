@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.valerochka1337.jwt.JwtTokenFilter;
 import org.valerochka1337.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -35,8 +36,7 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/v1/auth/login").permitAll()
-                    .anyRequest().authenticated())
+                auth.requestMatchers("/api/v1/auth/login").permitAll().anyRequest().authenticated())
         .sessionManagement(
             manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())

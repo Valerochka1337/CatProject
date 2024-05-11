@@ -1,4 +1,4 @@
-package org.valerochka1337;
+package org.valerochka1337.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -61,7 +61,6 @@ public class JwtTokenProvider {
 
       return !claimsJws.getBody().getExpiration().before(new Date());
     } catch (JwtException | IllegalArgumentException e) {
-      System.out.println(e.getMessage());
       throw new JwtAuthenticationException(
           "Jwt token is expired or invalid", HttpStatus.UNAUTHORIZED);
     }
